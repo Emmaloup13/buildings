@@ -2,8 +2,8 @@
   "name": "buildings",
   "source": "./index.html",
   "staticFiles": {
-    "staticOutPath": "./",
-    "staticPath": "./"
+    "staticOutPath": "./donnees",
+    "staticPath": "./donnees"
   },
   "scripts": {
     "start": "parcel --open",
@@ -13,10 +13,8 @@
   },
   "devDependencies": {
     "gh-pages": "^5.0.0",
+    "itowns": "^2.39.0",
     "parcel": "^2.8.3",
     "parcel-reporter-static-files-copy": "^1.5.0"
-  },
-  "dependencies": {
-    "itowns": "^2.39.0"
   }
 }
