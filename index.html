@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector data in 3D</title>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        #viewerDiv {
+            margin-top: 0px;
+            height: 800px;
+            width: 100%;
+            padding: 0;
+        }
+
+        canvas {
+            display: block
+        }
+
+        #form {
+            background-color: black;
+            color: aqua;
+            z-index: 10000;
+        }
+
+        #all {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="all">
+        <div id="form">
+            <form id="buttons" action="">
+
+                <label for="PeriodeConstruction">Période Construction</label>
+                <input type="radio" id="PeriodeConstruction" name="layer" value=1 checked>
+
+                <label for="DPEEnergy">DPE Energy</label>
+                <input type="radio" id="DPEEnergy" name="layer" value=2>
+
+                <label for="DPEGES">DPE GES</label>
+                <input type="radio" id="DPEGES" name="layer" value=3>
+
+                <label for="DateNotationDPE">Date Notation DPE</label>
+                <input type="radio" id="DateNotationDPE" name="layer" value=4> <br>
+
+                <label for="ConsommationKw">Consommation Kw/an</label>
+                <input type="radio" id="ConsommationKw" name="layer" value=5>
+
+                <label for="ConsommationGas">Consommation Gaz</label>
+                <input type="radio" id="ConsommationGas" name="layer" value=6>
+            </form>
+        </div>
+
+
+        <div id="viewerDiv">
+
+        </div>
+    </div>
+    <script src="node_modules/itowns/dist/itowns.js"></script>
+    <script src="FeatureTooltip.js"></script>
+    <script type="text/javascript">
+
+        //retrieve view html container element
+        const viewerDiv = document.getElementById('viewerDiv');
+        let buttons = document.getElementById('buttons');
+
+        //defining projection coordinate unit
+        itowns.proj4.defs(
+            'EPSG:2154',
+            '+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
+        );
+
+        //defining the views geographic extent, how far does it go
+        const viewExtent = new itowns.Extent(
+            'EPSG:2154',
+            644500.0, 659499.99,
+            6857500.0, 6867499.99,
+        );
+
+        //const view = new itowns.PlanarView(viewerDiv, viewExtent);
+
+        //defining the cameras placement
+        const placement = {
+            coord: viewExtent.center(),
+            tilt: 12,
+            heading: 40,
+            range: 3000,
+        }
+
+        //creating the planar view
+        const view = new itowns.PlanarView(viewerDiv, viewExtent, {
+            placement: placement,
+        });
+
+        //definin the source for the satellite color image  ortho-image
+        const sourceOrtho = new itowns.WMSSource({
+            url: "https://wxs.ign.fr/3ht7xcw6f7nciopo16etuqp2/geoportail/r/wms",
+            name: "HR.ORTHOIMAGERY.ORTHOPHOTOS",
+            format: 'image/png',
+            crs: 'EPSG:2154',
+            extent: viewExtent,
+        });
+
+        //defining the color layer, ortho-image
+        const layerOrtho = new itowns.ColorLayer('Ortho', { source: sourceOrtho });
+        // adding it to the view
+        view.addLayer(layerOrtho);
+
+        //defining the source of the ELevation model
+        const sourceDEM = new itowns.WMSSource({
+            url: "https://wxs.ign.fr/3ht7xcw6f7nciopo16etuqp2/geoportail/r/wms",
+            name: "ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES",
+            format: "image/x-bil;bits=32",
+            crs: 'EPSG:2154',
+            extent: viewExtent,
+        });
+
+        //creating the elevation layer
+        const layerDEM = new itowns.ElevationLayer('DEM', { source: sourceDEM });
+        //adding it to the view
+        view.addLayer(layerDEM);
+
+
+        function setAltitude(properties) {
+            if (properties.altitude_sol != null) {
+                return properties.altitude_sol + properties.hauteur;
+            } else {
+                return 30;
+
+            }
+        }
+
+        function setExtrusion(properties) {
+            return properties.hauteur;
+        }
+
+        function setColor(properties) {
+
+            return new itowns.THREE.Color(0xaaaaaa);
+        }
+
+        const batsource = new itowns.FileSource({
+            url: './paris_centre.geojson',
+            crs: 'EPSG:2154',
+            format: 'application/json',
+        });
+
+
+        let basic = new itowns.FeatureGeometryLayer('basic', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setColor,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+        //Change colors...
+        function setColorDateConstruction(properties) {
+            value = properties.periode_construction
+            let dic = {
+                '<1948': new itowns.THREE.Color(0xf7fcf5),
+                '1949-1970': new itowns.THREE.Color(0xe2f4dd),
+                '1970-1988': new itowns.THREE.Color(0xc0e6b9),
+                '1989-1999': new itowns.THREE.Color(0x94d390),
+                '2000-2005': new itowns.THREE.Color(0x60ba6c),
+                '2006-2012': new itowns.THREE.Color(0x329b51),
+                '>2012': new itowns.THREE.Color(0x277a3e)
+
+            }
+
+            if (dic[value] != null) {
+                return dic[value];
+            } else {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+
+        }
+        let dateConstruction = new itowns.FeatureGeometryLayer('dateConstruction', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setColorDateConstruction,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+        function setColorDpeEnergy(properties) {
+
+            value = properties.classe_conso_ener
+            let dic = {
+                'A': new itowns.THREE.Color(0x009735),
+                'B': new itowns.THREE.Color(0x00ff59),
+                'C': new itowns.THREE.Color(0xa8fa2d),
+                'D': new itowns.THREE.Color(0xf3fa25),
+                'E': new itowns.THREE.Color(0xfab91f),
+                'F': new itowns.THREE.Color(0xfa7108),
+                'G': new itowns.THREE.Color(0xfa0000),
+                'N': new itowns.THREE.Color(0xaaaaaa),
+            }
+
+            if (dic[value] != null) {
+                return dic[value];
+            } else {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+
+        }
+        let dpeEnergy = new itowns.FeatureGeometryLayer('dpeEnergy', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setColorDpeEnergy,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+        function setColorDpeGas(properties) {
+
+            value = properties.classe_estim_ges
+            let dic = {
+                'A': new itowns.THREE.Color(0xf0eef6),
+                'B': new itowns.THREE.Color(0xdcdcec),
+                'C': new itowns.THREE.Color(0xc0c1de),
+                'D': new itowns.THREE.Color(0xa3a0cb),
+                'E': new itowns.THREE.Color(0x8683bd),
+                'F': new itowns.THREE.Color(0x6a51a3),
+                'G': new itowns.THREE.Color(0x582e92),
+                'N': new itowns.THREE.Color(0xaaaaaa),
+            }
+
+            if (dic[value] != null) {
+                return dic[value];
+            } else {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+
+        }
+        let dpeGES = new itowns.FeatureGeometryLayer('dpeGES', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setColorDpeGas,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+        function setColorEnergyConso(properties) {
+            value = properties.conso_tot
+
+
+            if (value == 0) {
+
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+            else if (value > 0 && value <= 65000) {
+                return new itowns.THREE.Color(0xffe3e3)
+            }
+            else if (value > 65000 && value <= 200000) {
+                return new itowns.THREE.Color(0xffaaaa)
+            }
+            else if (value > 200000 && value <= 450000) {
+                return new itowns.THREE.Color(0xff8e8e)
+            }
+            else if (value > 450000 && value <= 900000) {
+                return new itowns.THREE.Color(0xff5555)
+            }
+            else if (value > 900000 && value <= 10000000) {
+                return new itowns.THREE.Color(0xff0000)
+            } else {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+        }
+
+
+        let consoTotalEnergy = new itowns.FeatureGeometryLayer('consoTotalEnergy', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setColorEnergyConso,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+
+        function setColorGazConso(properties) {
+            value = properties.conso_tot_2
+
+            if (value == 0) {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+            else if (value > 0 && value <= 55000) {
+                return new itowns.THREE.Color(0xffe3e3)
+            }
+            else if (value > 55000 && value <= 200000) {
+                return new itowns.THREE.Color(0xffaaaa)
+            }
+            else if (value > 200000 && value <= 450000) {
+                return new itowns.THREE.Color(0xff8e8e)
+            }
+            else if (value > 450000 && value <= 1000000) {
+                return new itowns.THREE.Color(0xff5555)
+            }
+            else if (value > 1000000 && value <= 10000000) {
+                return new itowns.THREE.Color(0xff0000)
+            } else {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+        }
+
+
+        let consoTotalGas = new itowns.FeatureGeometryLayer('consoTotalGas', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setColorGazConso,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+        //change colors
+        function setDPEdate(properties) {
+            if (properties.date_reception_dpe != null) {
+                value = properties.date_reception_dpe.substring(0, 4);
+
+                switch (value) {
+                    case '2013': return new itowns.THREE.Color(0xf7fbff);
+                    case '2014': return new itowns.THREE.Color(0xf7fbff);
+                    case '2015': return new itowns.THREE.Color(0xbed8ed);
+                    case '2016': return new itowns.THREE.Color(0x8fc2de);
+                    case '2017': return new itowns.THREE.Color(0x5ba3d0);
+                    case '2018': return new itowns.THREE.Color(0x3182be);
+                    case '2019': return new itowns.THREE.Color(0x105ca5);
+                    case '2020': return new itowns.THREE.Color(0x08306b);
+                    default: return new itowns.THREE.Color(0xaaaaaa);
+                }
+
+            } else {
+                return new itowns.THREE.Color(0xaaaaaa)
+            }
+        }
+
+        let dateDPE = new itowns.FeatureGeometryLayer('dateDPE', {
+            // Use a FileSource to load a single file once
+            source: batsource,
+            transparent: true,
+            opacity: 0.7,
+            //zoom: { min: 10 },
+            style: new itowns.Style({
+                fill: {
+                    color: setDPEdate,
+                    base_altitude: 28,
+                    extrusion_height: setExtrusion,
+                }
+            })
+        });
+
+        let initialLayer = buttons.elements['layer'].value;
+
+        buttons.addEventListener('change', changeLayer);
+        let layers = [dateConstruction, dpeEnergy, dpeGES, dateDPE, consoTotalEnergy, consoTotalGas]
+        view.addLayer(layers[initialLayer - 1]);
+        let currentLayer = initialLayer;
+
+        function changeLayer() {
+            let choixLayer = buttons.elements['layer'].value;
+            console.log(layers[currentLayer - 1].id);
+            view.removeLayer(layers[currentLayer - 1].id);
+            console.log(choixLayer);
+            currentLayer = choixLayer;
+            view.addLayer(layers[choixLayer - 1]);
+        }
+    </script>
+</body>
+
+</html>
