@@ -1,6 +1,10 @@
 {
   "name": "buildings",
   "source": "./index.html",
+  "staticFiles": {
+    "staticOutPath": "./",
+    "staticPath": "./"
+  },
   "scripts": {
     "start": "parcel --open",
     "build": "parcel build",
