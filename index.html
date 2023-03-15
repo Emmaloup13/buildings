@@ -3,8 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vector data in 3D</title>
     <style>
         html {
@@ -19,7 +17,7 @@
 
         #viewerDiv {
             margin-top: 0px;
-            height: 800px;
+            height: 1000px;
             width: 100%;
             padding: 0;
         }
@@ -31,12 +29,42 @@
         #form {
             background-color: black;
             color: aqua;
-            z-index: 10000;
+            z-index: 10;
         }
 
         #all {
             display: flex;
             flex-direction: column;
+        }
+
+        #Legend {
+            background-color: rgb(202, 194, 198);
+            z-index: 10000;
+            width: 150px;
+            height: fit-content;
+            right: 10px;
+            top: 10px;
+            position: absolute;
+            padding: 5px;
+            padding-bottom: 15px;
+            opacity: 80%;
+        }
+
+        .dot {
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 5px;
+
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        p {
+            display: inline
         }
     </style>
 </head>
@@ -65,7 +93,139 @@
                 <input type="radio" id="ConsommationGas" name="layer" value=6>
             </form>
         </div>
+        <div id="Legend">
 
+
+        </div>
+
+
+
+        <div id="hidden" hidden>
+
+            <div id="dateConstruction">
+                <h3> Legend </h3>
+                <br>
+                <span class="dot" style="background-color:#f7fcf5;"></span>
+                <p> avant 1948 </p> <br>
+                <span class="dot" style="background-color:#e2f4dd;"></span>
+                <p> 1949-1970 </p> <br>
+                <span class="dot" style="background-color:#e2f4dd;"></span>
+                <p> 1970-1988 </p> <br>
+                <span class="dot" style="background-color:#94d390;"></span>
+                <p> 1989-1999 </p> <br>
+                <span class="dot" style="background-color:#60ba6c;"></span>
+                <p> 2000-2005 </p> <br>
+                <span class="dot" style="background-color:#329b51;"></span>
+                <p> 2006-2012 </p> <br>
+                <span class="dot" style="background-color:#277a3e;"></span>
+                <p> >2012</p> <br>
+            </div>
+
+
+            <div id="dpeEnergy">
+                <h3> Legend </h3>
+                <br>
+                <span class="dot" style="background-color:#009735;"></span>
+                <p> A </p> <br>
+                <span class="dot" style="background-color:#00ff59;"></span>
+                <p> B </p> <br>
+                <span class="dot" style="background-color:#a8fa2d;"></span>
+                <p> C </p> <br>
+                <span class="dot" style="background-color:#f3fa25;"></span>
+                <p> D </p> <br>
+                <span class="dot" style="background-color:#fab91f;"></span>
+                <p> E </p> <br>
+                <span class="dot" style="background-color:#fa7108;"></span>
+                <p> F </p> <br>
+                <span class="dot" style="background-color:#277a3e;"></span>
+                <p> G</p> <br>
+                <span class="dot" style="background-color:#aaaaaa;"></span>
+                <p> no data</p> <br>
+            </div>
+
+
+            <div id="dpeGES">
+                <h3> Legend </h3>
+                <br>
+                <span class="dot" style="background-color:#f0eef6;"></span>
+                <p> A </p> <br>
+                <span class="dot" style="background-color:#dcdcec;"></span>
+                <p> B </p> <br>
+                <span class="dot" style="background-color:#c0c1de;"></span>
+                <p> C </p> <br>
+                <span class="dot" style="background-color:#a3a0cb;"></span>
+                <p> D </p> <br>
+                <span class="dot" style="background-color:#8683bd;"></span>
+                <p> E </p> <br>
+                <span class="dot" style="background-color:#6a51a3;"></span>
+                <p> F </p> <br>
+                <span class="dot" style="background-color:#582e92;"></span>
+                <p> G</p> <br>
+                <span class="dot" style="background-color:#aaaaaa;"></span>
+                <p> no data</p> <br>
+            </div>
+
+            <div id="dateDPE">
+                <h3> Legend </h3>
+                <br>
+                <span class="dot" style="background-color:#f0eef6;"></span>
+                <p> 2011 </p> <br>
+                <span class="dot" style="background-color:#dcdcec;"></span>
+                <p> 2012 </p> <br>
+                <span class="dot" style="background-color:#c0c1de;"></span>
+                <p> 2013 </p> <br>
+                <span class="dot" style="background-color:#f7fbff;"></span>
+                <p> 2014 </p> <br>
+                <span class="dot" style="background-color:#d4e8fc;"></span>
+                <p> 2015 </p> <br>
+                <span class="dot" style="background-color:#8fc2de;"></span>
+                <p> 2016 </p> <br>
+                <span class="dot" style="background-color:#5ba3d0;"></span>
+                <p> 2017</p> <br>
+                <span class="dot" style="background-color:#3182be;"></span>
+                <p> 2018 </p> <br>
+                <span class="dot" style="background-color:#105ca5;"></span>
+                <p> 2019 </p> <br>
+                <span class="dot" style="background-color:#08306b;"></span>
+                <p> 2020</p> <br>
+                <span class="dot" style="background-color:#aaaaaa;"></span>
+                <p> no data</p> <br>
+            </div>
+
+            <div id="consoTotalGas">
+                <h3> Legend </h3>
+                <br>
+                <span class="dot" style="background-color:#ffe3e3;"></span>
+                <p> 0 - 55000 litres </p> <br>
+                <span class="dot" style="background-color:#ffaaaa;"></span>
+                <p> 55001 - 200000 litres</p> <br>
+                <span class="dot" style="background-color:#ff8e8e;"></span>
+                <p> 200001 - 450000 litres </p> <br>
+                <span class="dot" style="background-color:#ff5555;"></span>
+                <p> 450001 - 1000000 litres </p> <br>
+                <span class="dot" style="background-color:#ff0000;"></span>
+                <p> 1000001 - 10000001 litres</p> <br>
+                <span class="dot" style="background-color:#aaaaaa;"></span>
+                <p> no data</p> <br>
+            </div>
+
+            <div id="consoTotalEnergy">
+                <h3> Legend </h3>
+                <br>
+                <span class="dot" style="background-color:#ffe3e3;"></span>
+                <p> 0 - 65000 kw/an </p> <br>
+                <span class="dot" style="background-color:#ffaaaa;"></span>
+                <p> 65001 - 200000 kw/an</p> <br>
+                <span class="dot" style="background-color:#ff8e8e;"></span>
+                <p> 200001 - 450000 kw/an </p> <br>
+                <span class="dot" style="background-color:#ff5555;"></span>
+                <p> 450001 - 900000 kw/an </p> <br>
+                <span class="dot" style="background-color:#ff0000;"></span>
+                <p> 900001 - 10000000 kw/an</p> <br>
+                <span class="dot" style="background-color:#aaaaaa;"></span>
+                <p> no data</p> <br>
+            </div>
+        </div>
 
         <div id="viewerDiv">
 
@@ -78,6 +238,8 @@
         //retrieve view html container element
         const viewerDiv = document.getElementById('viewerDiv');
         let buttons = document.getElementById('buttons');
+        let legend = document.getElementById('Legend');
+        let hidden = document.getElementById('hidden');
 
         //defining projection coordinate unit
         itowns.proj4.defs(
@@ -406,18 +568,24 @@
             })
         });
 
-        let initialLayer = buttons.elements['layer'].value;
 
+        buttons.reset();
+        let initialLayer = buttons.elements['layer'].value;
         buttons.addEventListener('change', changeLayer);
         let layers = [dateConstruction, dpeEnergy, dpeGES, dateDPE, consoTotalEnergy, consoTotalGas]
         view.addLayer(layers[initialLayer - 1]);
+        legend.append(document.getElementById("dateConstruction"));
         let currentLayer = initialLayer;
 
         function changeLayer() {
             let choixLayer = buttons.elements['layer'].value;
-            console.log(layers[currentLayer - 1].id);
+            hidden.append(document.getElementById(layers[currentLayer - 1].id));
             view.removeLayer(layers[currentLayer - 1].id);
-            console.log(choixLayer);
+
+            let layerLegend = document.getElementById(layers[choixLayer - 1].id);
+            legend.append(layerLegend)
+
+
             currentLayer = choixLayer;
             view.addLayer(layers[choixLayer - 1]);
         }
