@@ -9,7 +9,7 @@ https://emmaloup13.github.io/buildings/
 ## Description
 
 Géovisualisation 3D de la base de données nationale des bâtiments (BDNB) sur la zone de Paris Centre (Arrondissements 1,2,3,4) : 
-Nous avons extrudé les bâtiments sur cette zone. Nous visualisons les indicateurs suivants :
+Nous avons extrudé les bâtiments sur cette zone. Nous visualisons les indicateurs suivants à l'aide d'un sélecteur et d'une légende :
 * Période de construction
 * Diagnostic Performance Energétique et Gaz à Effet de Serre
 * Date de Notation DPE
