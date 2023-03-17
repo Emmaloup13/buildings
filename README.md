@@ -4,7 +4,7 @@ BDNB : Base de Données Nationale des Bâtiments
 
 ## Lien démonstration
 
-[https](https://emmaloup13.github.io/buildings/)
+https://emmaloup13.github.io/buildings/
 
 ## Description
 
